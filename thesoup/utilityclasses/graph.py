@@ -1,3 +1,6 @@
+import json
+
+
 class Edge:
     def __init__(self, src, destination, ppt):
         self.src = src
@@ -32,6 +35,14 @@ class DiGraph:
         """
         The edge to add
         :param edge: An `Edge` struct
+        :return:
+        """
+        pass
+
+    def __contains__(self, vertex):
+        """
+        returns if a vertex exists in the graph
+        :param vertex: the vertex to test
         :return:
         """
         pass
@@ -71,5 +82,21 @@ class AdjListGraph (DiGraph):
             ))
         self.storage[edge.src].add((edge.destination, edge.ppt))
 
+    def __contains__(self, vertex):
+        """
+        {} 
+        """.format(DiGraph.__contains__.__doc__)
+        return vertex in self.storage
 
-print(help(AdjListGraph))
+    @staticmethod
+    def from_json(json_str: str):
+        data = json.loads(json_str)
+        graph = AdjListGraph()
+        for v in data.keys():
+            graph.add_vertex(v)
+
+        for v, edges in data.items():
+            for destination, ppt in edges:
+                graph.add_edge(Edge(v, destination, ppt))
+
+        return graph

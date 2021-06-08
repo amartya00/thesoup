@@ -20,3 +20,16 @@ class TestGraph (unittest.TestCase):
         g = AdjListGraph()
         with self.assertRaises(ValueError):
             g.add_edge(Edge("A", "B", 28))
+
+    def test_json_initializer(self):
+        json_str = """
+        {
+            "A": [["B", 155], ["C", 123]],
+            "B": [],
+            "C": [["B", 98]]
+        }
+        """
+        g = AdjListGraph.from_json(json_str)
+        self.assertEqual({("B", 155), ("C", 123)}, g.get_neighbours("A"))
+        self.assertEqual({("B", 98)}, g.get_neighbours("C"))
+        self.assertEqual(set(), g.get_neighbours("B"))
