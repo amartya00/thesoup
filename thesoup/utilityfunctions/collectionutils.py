@@ -5,7 +5,9 @@ def flatten(item):
     :param item: A possibly nested iterable
     :return: A flat list
     """
-    if hasattr(item, "__iter__"):
+    if type(item) == str:
+        return item
+    elif hasattr(item, "__iter__"):
         flattened = []
         for itm in item:
             flattened.extend(flatten(itm))
