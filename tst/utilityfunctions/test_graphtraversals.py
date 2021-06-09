@@ -2,6 +2,7 @@ import unittest
 
 from thesoup.utilityclasses.graph import AdjListGraph
 from thesoup.utilityfunctions.graphtraversals import bfs, dfs, dijkstra
+from thesoup.utilityfunctions.collectionutils import flatten
 
 
 class TestGraphTraversals (unittest.TestCase):
@@ -16,12 +17,12 @@ class TestGraphTraversals (unittest.TestCase):
         }
         """
         graph = AdjListGraph.from_json(json_str)
-        self.assertEqual({"A", "B", "C", "D", "E"}, bfs(graph, "A"))
-        self.assertEqual({"B"}, bfs(graph, "B"))
-        self.assertEqual({"B", "C", "D", "E"}, bfs(graph, "C"))
-        self.assertEqual({"D", "E"}, bfs(graph, "D"))
-        self.assertEqual({"E"}, bfs(graph, "E"))
-        self.assertEqual(set(), bfs(graph, "Z"))
+        self.assertEqual({0: {"A"}, 1: {"B", "C"}, 2: {"D"}, 3: {"E"}}, bfs(graph, "A"))
+        self.assertEqual({"B"}, set(flatten(bfs(graph, "B").values())))
+        self.assertEqual({"B", "C", "D", "E"}, set(flatten(bfs(graph, "C").values())))
+        self.assertEqual({"D", "E"}, set(flatten(bfs(graph, "D").values())))
+        self.assertEqual({"E"}, set(flatten(bfs(graph, "E").values())))
+        self.assertEqual(set(), set(flatten(bfs(graph, "Z").values())))
 
     def test_dfs(self):
         json_str = """
@@ -34,12 +35,18 @@ class TestGraphTraversals (unittest.TestCase):
         }
         """
         graph = AdjListGraph.from_json(json_str)
-        self.assertEqual({"A", "B", "C", "D", "E"}, dfs(graph, "A"))
-        self.assertEqual({"B"}, dfs(graph, "B"))
-        self.assertEqual({"B", "C", "D", "E"}, dfs(graph, "C"))
-        self.assertEqual({"D", "E"}, dfs(graph, "D"))
-        self.assertEqual({"E"}, dfs(graph, "E"))
-        self.assertEqual(set(), dfs(graph, "Z"))
+        parents = dfs(graph, "A")
+        self.assertTrue(parents["A"] is None)
+        self.assertTrue(parents["B"] == "A" or parents["B"] == "C")
+        self.assertTrue(parents["C"] == "A")
+        self.assertTrue(parents["D"] == "C")
+        self.assertTrue(parents["E"] == "D")
+
+        self.assertEqual({"B"}, set(dfs(graph, "B").keys()))
+        self.assertEqual({"B", "C", "D", "E"}, set(dfs(graph, "C").keys()))
+        self.assertEqual({"D", "E"}, set(dfs(graph, "D").keys()))
+        self.assertEqual({"E"}, set(dfs(graph, "E").keys()))
+        self.assertEqual(set(), set(dfs(graph, "Z").keys()))
 
     def test_dijkstra(self):
         sample_graph_json = """

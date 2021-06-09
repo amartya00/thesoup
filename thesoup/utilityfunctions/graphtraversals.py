@@ -10,18 +10,19 @@ def bfs(graph: DiGraph, start):
 
     :param graph: The Digraph to traverse
     :param start: The starting point
-    :return: A set of traversed vertices.
+    :return: A map of level vs traversed vertices.
     """
-    v_set = set()
+    levels = dict()
     visited = set()
     if start in graph:
-        v_set.add(start)
+        levels[0] = {start}
     else:
-        return set()
+        return dict()
     frontier = set(map(lambda node: node[0], graph.get_neighbours(start)))
-
+    level = 1
     while len(frontier) > 0:
-        v_set.update(frontier)
+        levels[level] = set()
+        levels[level].update(frontier)
         visited.update(frontier)
         next_frontier = filter(
             lambda elem: elem not in visited,
@@ -32,20 +33,15 @@ def bfs(graph: DiGraph, start):
             )
         )
         frontier = set(next_frontier)
-    return v_set
+        level += 1
+    return levels
 
 
-def _dfs_callback(graph: DiGraph, start, visited: set):
-    if start not in graph:
-        return set()
-    nodes = {start}
-    if start in visited:
-        return set()
-    else:
-        visited.add(start)
-        for n in map(lambda x: x[0], graph.get_neighbours(start)):
-            nodes.update(_dfs_callback(graph, n, visited))
-    return nodes
+def _dfs_callback(graph: DiGraph, start, parents: dict):
+    for n in map(lambda x: x[0], graph.get_neighbours(start)):
+        if n not in parents:
+            parents[n] = start
+            _dfs_callback(graph, n, parents)
 
 
 def dfs(graph: DiGraph, start):
@@ -55,10 +51,13 @@ def dfs(graph: DiGraph, start):
 
     :param graph: The Digraph to traverse
     :param start: The starting point
-    :return: A set of traversed vertices.
+    :return: A map of traversed vertices vs it's parents.
     """
-    visited = set()
-    return _dfs_callback(graph, start, visited)
+    if start not in graph:
+        return dict()
+    parents = {start: None}
+    _dfs_callback(graph, start, parents)
+    return parents
 
 
 def dijkstra(graph: DiGraph, start) -> tuple:
