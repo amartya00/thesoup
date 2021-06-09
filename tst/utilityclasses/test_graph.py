@@ -1,6 +1,6 @@
 import unittest
 
-from thesoup.utilityclasses.graph import AdjListGraph, Edge
+from thesoup.utilityclasses.graph import AdjListDiGraph, Edge, AdjListUndirectedDiGraph
 
 
 class TestEdge (unittest.TestCase):
@@ -38,10 +38,19 @@ class TestEdge (unittest.TestCase):
         e = Edge("A", "B", 100)
         self.assertEqual("{}.{}.{}".format("A", "B", 100), str(e))
 
+    def test_edge_compares(self):
+        e1 = Edge("A", "B", 123)
+        e2 = Edge("A", "B", 110)
+        e3 = Edge("A", "C", 192)
+        e4 = Edge("A", "B", 101)
+        edges = [e1, e2, e3, e4]
+        edges.sort()
+        self.assertEqual([e4, e2, e1, e3], edges)
 
-class TestGraph (unittest.TestCase):
+
+class TestDiGraph (unittest.TestCase):
     def test_graph_happy_case(self):
-        g = AdjListGraph()
+        g = AdjListDiGraph()
         g.add_vertex("A")
         g.add_vertex("B")
         g.add_vertex("C")
@@ -57,7 +66,7 @@ class TestGraph (unittest.TestCase):
         self.assertEqual(expected_edge_set, g.edges())
 
     def test_exception_on_invalid_edge(self):
-        g = AdjListGraph()
+        g = AdjListDiGraph()
         with self.assertRaises(ValueError):
             g.add_edge(Edge("A", "B", 28))
 
@@ -69,7 +78,7 @@ class TestGraph (unittest.TestCase):
             "C": [["B", 98]]
         }
         """
-        g = AdjListGraph.from_json(json_str)
+        g = AdjListDiGraph.from_json(json_str)
         self.assertEqual({("B", 155), ("C", 123)}, g.get_neighbours("A"))
         self.assertEqual({("B", 98)}, g.get_neighbours("C"))
         self.assertEqual(set(), g.get_neighbours("B"))
@@ -77,3 +86,19 @@ class TestGraph (unittest.TestCase):
 
         expected_edge_set = {Edge("A", "B", 155), Edge("A", "C", 123), Edge("C", "B", 98)}
         self.assertEqual(expected_edge_set, g.edges())
+
+
+class TestUndirectedGraph (unittest.TestCase):
+    def test_undirected_graph(self):
+        g = AdjListUndirectedDiGraph()
+        g.add_vertex("A")
+        g.add_vertex("B")
+        g.add_vertex("C")
+        g.add_vertex("D")
+        g.add_vertex("E")
+        g.add_vertex("F")
+        g.add_edge(Edge("A", "F", 100))
+        g.add_edge(Edge("F", "A", 100))
+        g.add_edge(Edge("A", "C", 117))
+        g.add_edge(Edge("C", "F", 165))
+        self.assertEqual(3, len(g.edges()))

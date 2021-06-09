@@ -31,8 +31,13 @@ class Edge:
     def __str__(self):
         return "{}.{}.{}".format(self.src, self.destination, self.ppt)
 
+    def __gt__(self, other):
+        if type(other) != Edge:
+            raise TypeError("Cannot compare edge to non edge")
+        return self.ppt > other.ppt
 
-class DiGraph (ABC):
+
+class Graph (ABC):
     """
     This is the interface for a directed graph
     """
@@ -70,10 +75,10 @@ class DiGraph (ABC):
         pass
 
 
-class MutableDigraph (DiGraph):
+class MutableGraph (Graph):
     """
-    This is the interfaces for a directed graph. Aside from the basic interfaces for getting the neighbours and testing if
-    the graph contains an element, it also provides interfaces to add vertices and edges to the graph
+    This is the interfaces for a mutable directed graph. Aside from the basic interfaces for getting the neighbours and
+    testing if the graph contains an element, it also provides interfaces to add vertices and edges to the graph
     """
     @abstractmethod
     def add_vertex(self, item):
@@ -94,16 +99,16 @@ class MutableDigraph (DiGraph):
         pass
 
 
-class AdjListGraph (MutableDigraph):
+class AdjListDiGraph (MutableGraph):
     """
-    Implementation of a directed graph using adjacensy list
+    Implementation of a directed graph using adjacency list
     """
     def __init__(self):
         self.storage = dict()
 
     """
     {}
-    """.format(DiGraph.get_neighbours.__doc__)
+    """.format(Graph.get_neighbours.__doc__)
     def get_neighbours(self, item) -> list:
         if item not in self.storage:
             return None
@@ -112,14 +117,14 @@ class AdjListGraph (MutableDigraph):
 
     """
     {}
-    """.format(MutableDigraph.add_vertex.__doc__)
+    """.format(MutableGraph.add_vertex.__doc__)
     def add_vertex(self, item):
         if item not in self.storage:
             self.storage[item] = set()
 
     """
     {}
-    """.format(MutableDigraph.add_edge.__doc__)
+    """.format(MutableGraph.add_edge.__doc__)
     def add_edge(self, edge: Edge):
         if edge.src not in self.storage or edge.destination not in self.storage:
             raise ValueError("Either the source ({}) or destination ({}) of the edge is not in the graph".format(
@@ -131,7 +136,7 @@ class AdjListGraph (MutableDigraph):
     def __contains__(self, item):
         """
         {} 
-        """.format(DiGraph.__contains__.__doc__)
+        """.format(Graph.__contains__.__doc__)
         if type(item) == Edge:
             return item.src in self.storage and (item.destination, item.ppt) in item.storage[item.src]
         else:
@@ -140,19 +145,19 @@ class AdjListGraph (MutableDigraph):
     def vertices(self) -> list:
         """
         {}
-        """.format(DiGraph.vertices.__doc__)
+        """.format(Graph.vertices.__doc__)
         return set(self.storage.keys())
 
     def edges(self) -> set:
         """
         {}
-        """.format(DiGraph.edges.__doc__)
+        """.format(Graph.edges.__doc__)
         return set(flatten([[Edge(v, e[0], e[1]) for e in edges] for v, edges in self.storage.items()]))
 
     @staticmethod
     def from_json(json_str: str):
         data = json.loads(json_str)
-        graph = AdjListGraph()
+        graph = AdjListDiGraph()
         for v in data.keys():
             graph.add_vertex(v)
 
@@ -161,3 +166,42 @@ class AdjListGraph (MutableDigraph):
                 graph.add_edge(Edge(v, destination, ppt))
 
         return graph
+
+
+class AdjListUndirectedDiGraph (AdjListDiGraph):
+    """
+    Implementation of a directed graph using adjacency list.
+    NOTE: For this, the vertices have to have the __gt__ operator implemented.
+    NOTE: This does allow multiple edges with different weights to exist between nodes.
+    """
+
+    def add_edge(self, edge: Edge):
+        if edge.src not in self.storage or edge.destination not in self.storage:
+            raise ValueError("Either the source ({}) or destination ({}) of the edge is not in the graph".format(
+                edge.src,
+                edge.destination
+            )
+        )
+        self.storage[edge.src].add((edge.destination, edge.ppt))
+        self.storage[edge.destination].add((edge.src, edge.ppt))
+
+    def edges(self) -> set:
+        return set(
+            flatten(
+                [[Edge(v, e[0], e[1]) if e[0] > v else Edge(e[0], v, e[1]) for e in edges] for v, edges in self.storage.items()]
+            )
+        )
+
+    @staticmethod
+    def from_json(json_str: str):
+        data = json.loads(json_str)
+        graph = AdjListUndirectedDiGraph()
+        for v in data.keys():
+            graph.add_vertex(v)
+
+        for v, edges in data.items():
+            for destination, ppt in edges:
+                graph.add_edge(Edge(v, destination, ppt))
+
+        return graph
+

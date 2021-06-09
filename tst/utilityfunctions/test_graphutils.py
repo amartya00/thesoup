@@ -1,10 +1,10 @@
 import unittest
 
-from thesoup.utilityfunctions.graphutils import topological_sort
-from thesoup.utilityclasses.graph import AdjListGraph
+from thesoup.utilityfunctions.graphutils import topological_sort, kruskal
+from thesoup.utilityclasses.graph import AdjListDiGraph, AdjListUndirectedDiGraph, Edge
 
 
-class TestTopologicalSort (unittest.TestCase):
+class TestGraphUtils (unittest.TestCase):
     def test_topological_sort(self):
         sample_graph_json = """
         {
@@ -18,7 +18,7 @@ class TestTopologicalSort (unittest.TestCase):
             "H": []
         }
         """
-        graph = AdjListGraph.from_json(sample_graph_json)
+        graph = AdjListDiGraph.from_json(sample_graph_json)
         vertices = dict(
             map(
                 lambda elem: (elem[1], elem[0]),
@@ -28,3 +28,15 @@ class TestTopologicalSort (unittest.TestCase):
         for edge in graph.edges():
             s, d = edge.src, edge.destination
             self.assertTrue(vertices[s] < vertices[d])
+
+    def test_kruskal(self):
+        sample_graph_json = """
+        {
+            "A": [["B", 9], ["C", 8], ["D", 4]],
+            "B": [["D", 2]],
+            "C": [["D", 3]],
+            "D": []
+        }
+        """
+        graph = AdjListUndirectedDiGraph.from_json(sample_graph_json)
+        self.assertEqual({Edge("A", "D", 4), Edge("B", "D", 2), Edge("C", "D", 3)}, kruskal(graph))

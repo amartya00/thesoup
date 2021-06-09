@@ -1,6 +1,6 @@
 import unittest
 
-from thesoup.utilityclasses.graph import AdjListGraph
+from thesoup.utilityclasses.graph import AdjListDiGraph
 from thesoup.utilityfunctions.graphtraversals import bfs, dfs, dijkstra
 from thesoup.utilityfunctions.collectionutils import flatten
 
@@ -16,7 +16,7 @@ class TestGraphTraversals (unittest.TestCase):
             "E": []
         }
         """
-        graph = AdjListGraph.from_json(json_str)
+        graph = AdjListDiGraph.from_json(json_str)
         self.assertEqual({0: {"A"}, 1: {"B", "C"}, 2: {"D"}, 3: {"E"}}, bfs(graph, "A"))
         self.assertEqual({"B"}, set(flatten(bfs(graph, "B").values())))
         self.assertEqual({"B", "C", "D", "E"}, set(flatten(bfs(graph, "C").values())))
@@ -34,7 +34,7 @@ class TestGraphTraversals (unittest.TestCase):
             "E": []
         }
         """
-        graph = AdjListGraph.from_json(json_str)
+        graph = AdjListDiGraph.from_json(json_str)
         parents = dfs(graph, "A")
         self.assertTrue(parents["A"] is None)
         self.assertTrue(parents["B"] == "A" or parents["B"] == "C")
@@ -57,7 +57,7 @@ class TestGraphTraversals (unittest.TestCase):
             "D": []
         }
         """
-        graph = AdjListGraph.from_json(sample_graph_json)
+        graph = AdjListDiGraph.from_json(sample_graph_json)
         d, predecessors = dijkstra(graph, "A")
         self.assertEqual({"A": 0, "B": 5, "C": 2, "D": 14}, d)
         self.assertEqual({"A": None, "B": "C", "C": "A", "D": "B"}, predecessors)

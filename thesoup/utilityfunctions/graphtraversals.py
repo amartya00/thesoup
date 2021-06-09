@@ -1,9 +1,9 @@
-from thesoup.utilityclasses.graph import DiGraph
+from thesoup.utilityclasses.graph import Graph
 from thesoup.utilityclasses.heap import MinHeap
 from thesoup.utilityfunctions.collectionutils import flatten
 
 
-def bfs(graph: DiGraph, start):
+def bfs(graph: Graph, start):
     """
     This implements bread first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
@@ -37,14 +37,14 @@ def bfs(graph: DiGraph, start):
     return levels
 
 
-def _dfs_callback(graph: DiGraph, start, parents: dict):
+def _dfs_callback(graph: Graph, start, parents: dict):
     for n in map(lambda x: x[0], graph.get_neighbours(start)):
         if n not in parents:
             parents[n] = start
             _dfs_callback(graph, n, parents)
 
 
-def dfs(graph: DiGraph, start):
+def dfs(graph: Graph, start):
     """
     This implements depth first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
@@ -60,7 +60,7 @@ def dfs(graph: DiGraph, start):
     return parents
 
 
-def dijkstra(graph: DiGraph, start) -> (dict, dict):
+def dijkstra(graph: Graph, start) -> (dict, dict):
     """
     This implements the dijkstra's algorithm fpr shortest path. It returns a tuple containing 2 dictionaries:
     a map of distances of vertices from `start` and another congaing the predecessor of each vertex.
