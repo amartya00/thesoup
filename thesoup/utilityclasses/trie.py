@@ -74,22 +74,22 @@ class Trie:
         self.root = TrieNode()
 
     @staticmethod
-    def insert_callback(word: str, start_pos: int, node: TrieNode):
+    def _insert_callback(word: str, start_pos: int, node: TrieNode):
         if start_pos == len(word) - 1:
             node.set_char(word[start_pos], True)
         else:
             node.set_char(word[start_pos])
-            Trie.insert_callback(word, start_pos + 1, node[word[start_pos]])
+            Trie._insert_callback(word, start_pos + 1, node[word[start_pos]])
 
     @staticmethod
-    def search_callback(word: str, pos: int, node: TrieNode) -> bool:
+    def _search_callback(word: str, pos: int, node: TrieNode) -> bool:
         if pos == len(word):
             return node
         else:
-            return Trie.search_callback(word, pos + 1, node[word[pos]]) if (word[pos] in node) else None
+            return Trie._search_callback(word, pos + 1, node[word[pos]]) if (word[pos] in node) else None
 
     @staticmethod
-    def collect_branches(node: TrieNode) -> list:
+    def _collect_branches(node: TrieNode) -> list:
         if node is None:
             return ['']
         sub_strings = []
@@ -100,7 +100,7 @@ class Trie:
             if end_marker:
                 sub_strings.append(char)
 
-            more_substrings = ["{}{}".format(char, s) for s in Trie.collect_branches(nxt)]
+            more_substrings = ["{}{}".format(char, s) for s in Trie._collect_branches(nxt)]
             sub_strings.extend(more_substrings)
         return sub_strings
 
@@ -110,7 +110,7 @@ class Trie:
         :param word: The word to insert into the trie
         :return
         """
-        Trie.insert_callback(word, 0, self.root)
+        Trie._insert_callback(word, 0, self.root)
 
     def __contains__(self, word: str) -> bool:
         """
@@ -118,7 +118,7 @@ class Trie:
         :param word:
         :return: `boolean` whether the trie contains the word
         """
-        terminal_node = Trie.search_callback(word, 0, self.root)
+        terminal_node = Trie._search_callback(word, 0, self.root)
         return False if terminal_node is None else terminal_node.end_marker
 
     def __getitem__(self, word: str) -> list:
@@ -127,9 +127,9 @@ class Trie:
         :param word: The index
         :return: A list of words under the index
         """
-        terminal_node = Trie.search_callback(word, 0, self.root)
+        terminal_node = Trie._search_callback(word, 0, self.root)
         entries = []
         if terminal_node.end_marker:
             entries.append(word)
-        entries.extend(["{}{}".format(word, s) for s in Trie.collect_branches(terminal_node)])
+        entries.extend(["{}{}".format(word, s) for s in Trie._collect_branches(terminal_node)])
         return entries

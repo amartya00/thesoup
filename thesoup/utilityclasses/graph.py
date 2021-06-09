@@ -1,20 +1,42 @@
 import json
+from abc import ABC, abstractmethod
+from thesoup.utilityfunctions.collectionutils import flatten
 
 
 class Edge:
+    """
+    This class is meant to represent an edge of a graph. It has 3 members: source, destination and a "property". This
+    is left vague on purpose. Use the "property" to indicate weight or something else if you like.
+
+    All the 3 members must define the `__str__` and `__eq__` methods.
+    """
     def __init__(self, src, destination, ppt):
         self.src = src
         self.destination = destination
         self.ppt = ppt
 
-    def __hash__(self):
-        hash("{}.{}.{}".format(self.src, self.destination, self.ppt))
+    def __hash__(self) -> int:
+        return int(
+            hash(
+                "{}.{}.{}".format(self.src, self.destination, self.ppt)
+            )
+        )
+
+    def __eq__(self, other) -> bool:
+        return type(other) == Edge and \
+               self.src == other.src and \
+               self.destination == other.destination and \
+               other.ppt == self.ppt
+
+    def __str__(self):
+        return "{}.{}.{}".format(self.src, self.destination, self.ppt)
 
 
-class DiGraph:
+class DiGraph (ABC):
     """
     This is the interface for a directed graph
     """
+    @abstractmethod
     def get_neighbours(self, item) -> list:
         """
         Returns the neighbours of a vertex
@@ -23,6 +45,37 @@ class DiGraph:
         """
         pass
 
+    @abstractmethod
+    def __contains__(self, item):
+        """
+        Returns if a vertex or an edge exists in the graph.
+        NOTE: To test the existence of an edge, pass an object of `Edge` type
+        :param item: the vertex or edge to test
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def vertices(self) -> set:
+        """
+        Returns the set of vertices
+        """
+        pass
+
+    @abstractmethod
+    def edges(self) -> set:
+        """
+        Returns the set of edges as `Edge` objects
+        """
+        pass
+
+
+class MutableDigraph (DiGraph):
+    """
+    This is the interfaces for a directed graph. Aside from the basic interfaces for getting the neighbours and testing if
+    the graph contains an element, it also provides interfaces to add vertices and edges to the graph
+    """
+    @abstractmethod
     def add_vertex(self, item):
         """
         Adds a vertex
@@ -31,6 +84,7 @@ class DiGraph:
         """
         pass
 
+    @abstractmethod
     def add_edge(self, edge: Edge):
         """
         The edge to add
@@ -39,16 +93,8 @@ class DiGraph:
         """
         pass
 
-    def __contains__(self, vertex):
-        """
-        returns if a vertex exists in the graph
-        :param vertex: the vertex to test
-        :return:
-        """
-        pass
 
-
-class AdjListGraph (DiGraph):
+class AdjListGraph (MutableDigraph):
     """
     Implementation of a directed graph using adjacensy list
     """
@@ -66,14 +112,14 @@ class AdjListGraph (DiGraph):
 
     """
     {}
-    """.format(DiGraph.add_vertex.__doc__)
+    """.format(MutableDigraph.add_vertex.__doc__)
     def add_vertex(self, item):
         if item not in self.storage:
             self.storage[item] = set()
 
     """
     {}
-    """.format(DiGraph.add_edge.__doc__)
+    """.format(MutableDigraph.add_edge.__doc__)
     def add_edge(self, edge: Edge):
         if edge.src not in self.storage or edge.destination not in self.storage:
             raise ValueError("Either the source ({}) or destination ({}) of the edge is not in the graph".format(
@@ -82,11 +128,26 @@ class AdjListGraph (DiGraph):
             ))
         self.storage[edge.src].add((edge.destination, edge.ppt))
 
-    def __contains__(self, vertex):
+    def __contains__(self, item):
         """
         {} 
         """.format(DiGraph.__contains__.__doc__)
-        return vertex in self.storage
+        if type(item) == Edge:
+            return item.src in self.storage and (item.destination, item.ppt) in item.storage[item.src]
+        else:
+            return item in self.storage
+
+    def vertices(self) -> list:
+        """
+        {}
+        """.format(DiGraph.vertices.__doc__)
+        return set(self.storage.keys())
+
+    def edges(self) -> set:
+        """
+        {}
+        """.format(DiGraph.edges.__doc__)
+        return set(flatten([[Edge(v, e[0], e[1]) for e in edges] for v, edges in self.storage.items()]))
 
     @staticmethod
     def from_json(json_str: str):
