@@ -60,7 +60,7 @@ def dfs(graph: DiGraph, start):
     return parents
 
 
-def dijkstra(graph: DiGraph, start) -> tuple:
+def dijkstra(graph: DiGraph, start) -> (dict, dict):
     """
     This implements the dijkstra's algorithm fpr shortest path. It returns a tuple containing 2 dictionaries:
     a map of distances of vertices from `start` and another congaing the predecessor of each vertex.
