@@ -7,6 +7,10 @@ def bfs(graph: DiGraph, start):
     """
     This implements bread first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
+
+    :param graph: The Digraph to traverse
+    :param start: The starting point
+    :return: A set of traversed vertices.
     """
     v_set = set()
     visited = set()
@@ -48,6 +52,10 @@ def dfs(graph: DiGraph, start):
     """
     This implements depth first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
+
+    :param graph: The Digraph to traverse
+    :param start: The starting point
+    :return: A set of traversed vertices.
     """
     visited = set()
     return _dfs_callback(graph, start, visited)
@@ -55,7 +63,12 @@ def dfs(graph: DiGraph, start):
 
 def dijkstra(graph: DiGraph, start) -> tuple:
     """
-    This implements the dijkstra's algorithm fpr shortest path
+    This implements the dijkstra's algorithm fpr shortest path. It returns a tuple containing 2 dictionaries:
+    a map of distances of vertices from `start` and another congaing the predecessor of each vertex.
+
+    :param graph: The Digraph to traverse
+    :param start: The starting point
+    :return: A tuple (distances from start, predecessors).
     """
     if start not in graph:
         return dict(), dict()
