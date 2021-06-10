@@ -20,15 +20,16 @@ setup(
     description="A soup of random python utils",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="hhttps://github.com/amartya00/thesoup",
+    url="https://github.com/amartya00/thesoup",
     author="Amartya Datta Gupta",
     author_email="amartya00@gmail.com",
+    license='GPLv2',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Utils',
-        'License :: GPLV2',
-        'Programming Language :: Python :: 3.6',
+        'Topic :: Software Development',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'Programming Language :: Python :: 3.9',
     ],
     packages=["thesoup.utilityclasses", "thesoup.utilityfunctions"],
     install_requires=[],
@@ -37,6 +38,6 @@ setup(
         'test': ["nose"],
     },
     project_urls={
-        "Source": "hhttps://github.com/amartya00/thesoup"
+        "Source": "https://github.com/amartya00/thesoup"
     },
 )
