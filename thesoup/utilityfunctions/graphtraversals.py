@@ -96,3 +96,39 @@ def dijkstra(graph: Graph, start) -> (dict, dict):
                 predecessors[v] = u
         heap.build_heap()
     return d, predecessors
+
+
+def _shortest_path_dag_explorer(graph: Graph, predecessors: dict, memo: dict, start, end):
+    if start == end:
+        return 0
+    elif (start, end) in memo:
+        return memo[(start, end)]
+    else:
+        neighbours = graph.get_neighbours(start)
+        if neighbours is None:
+            return float('inf')
+        if len(neighbours) == 0:
+            return float('inf')
+        sp, n = min(
+            [(_shortest_path_dag_explorer(graph, predecessors, memo, n, end) + ppt, n) for n, ppt in neighbours]
+        )
+        if sp != float('inf'):
+            memo[(start, end)] = sp
+            predecessors[n] = start
+        return sp
+
+
+def shortest_path_dag(graph: Graph, start, end) -> (float, dict):
+    """
+    This function implements a special case SP algorithm for DAGs. Since it's a DAG, we can do this in a dynamic graph
+    as well.
+    NOTE: This
+    :param graph: The Digraph to traverse
+    :param start: The starting point
+    :param end: The ending point
+    :return: A tuple (shortest path, predecessors map).
+    """
+    memo = dict()
+    predecessors = {start: None}
+    sp = _shortest_path_dag_explorer(graph, predecessors, memo, start, end)
+    return sp, predecessors
