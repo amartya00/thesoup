@@ -2,7 +2,6 @@ import unittest
 
 from thesoup.utilityclasses.graph import AdjListDiGraph
 from thesoup.utilityfunctions.graphtraversals import bfs, dfs, dijkstra, shortest_path_dag
-from thesoup.utilityfunctions.collectionutils import flatten
 
 
 class TestGraphTraversals (unittest.TestCase):
@@ -17,12 +16,25 @@ class TestGraphTraversals (unittest.TestCase):
         }
         """
         graph = AdjListDiGraph.from_json(json_str)
-        self.assertEqual({0: {"A"}, 1: {"B", "C"}, 2: {"D"}, 3: {"E"}}, bfs(graph, "A"))
-        self.assertEqual({"B"}, set(flatten(bfs(graph, "B").values())))
-        self.assertEqual({"B", "C", "D", "E"}, set(flatten(bfs(graph, "C").values())))
-        self.assertEqual({"D", "E"}, set(flatten(bfs(graph, "D").values())))
-        self.assertEqual({"E"}, set(flatten(bfs(graph, "E").values())))
-        self.assertEqual(set(), set(flatten(bfs(graph, "Z").values())))
+        self.assertEqual(
+            {"A": (None, 0), "B": ("A", 1), "C": ("A", 1), "D": ("C", 2), "E": ("D", 3)},
+            bfs(graph, "A")
+        )
+        self.assertEqual(
+            {"B"}, set(bfs(graph, "B").keys())
+        )
+        self.assertEqual(
+            {"B", "C", "D", "E"}, set(bfs(graph, "C").keys())
+        )
+        self.assertEqual(
+            {"D", "E"}, set(bfs(graph, "D").keys())
+        )
+        self.assertEqual(
+            {"E"}, set(bfs(graph, "E").keys())
+        )
+        self.assertEqual(
+            set(), set(bfs(graph, "Z").keys())
+        )
 
     def test_dfs(self):
         json_str = """

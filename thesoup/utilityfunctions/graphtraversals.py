@@ -1,40 +1,44 @@
 from thesoup.utilityclasses.graph import Graph
 from thesoup.utilityclasses.heap import MinHeap
-from thesoup.utilityfunctions.collectionutils import flatten
+from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple
 
 
-def bfs(graph: Graph, start):
+def bfs(graph: Graph, start) -> dict:
     """
     This implements bread first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
 
     :param graph: The Digraph to traverse
     :param start: The starting point
-    :return: A map of level vs traversed vertices.
+    :return: A map of predecessors and levels.
     """
-    levels = dict()
-    visited = set()
+    predecessors = dict()
     if start in graph:
-        levels[0] = {start}
+        predecessors[start] = (None, 0)
     else:
         return dict()
-    frontier = set(map(lambda node: node[0], graph.get_neighbours(start)))
+    frontier = {start}
     level = 1
     while len(frontier) > 0:
-        levels[level] = set()
-        levels[level].update(frontier)
-        visited.update(frontier)
-        next_frontier = filter(
-            lambda elem: elem not in visited,
-            set(
-                flatten(
-                    [map(lambda node: node[0], graph.get_neighbours(n)) for n in frontier]
-                )
+        next_frontier_unfiltered = flatten_to_tuple(
+                [set(map(
+                    lambda node: (node[0], (u, level)),
+                    graph.get_neighbours(u)
+                )) for u in frontier]
+            )
+        next_frontier = set(filter(
+            lambda elem: elem[0] not in predecessors,
+            next_frontier_unfiltered
+        ))
+        predecessors.update(next_frontier)
+        frontier = set(
+            map(
+                lambda item: item[0],
+                next_frontier
             )
         )
-        frontier = set(next_frontier)
         level += 1
-    return levels
+    return predecessors
 
 
 def _dfs_callback(graph: Graph, start, parents: dict):
