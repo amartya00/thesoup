@@ -23,6 +23,9 @@ It has the following utility classes:
     - Min heap `Minheap`
     - Max heap `MaxHeap`
     
+   - Binary trees
+     - BST `BinarySearchTree`
+    
   - Trie (ASCII only)
   
 ## Functions
@@ -35,5 +38,6 @@ It has the following utility functions
     - Bread first search `bfs`
     - Depth first search `dfs`
     - Dijkstra `dijkstra`
+    - Specialized SP for DAGs `shortest_path_dag`
     
     
