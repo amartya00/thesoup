@@ -40,4 +40,7 @@ It has the following utility functions
     - Dijkstra `dijkstra`
     - Specialized SP for DAGs `shortest_path_dag`
     
+  - Other
+    - K-way merge `merge`
+    
     
