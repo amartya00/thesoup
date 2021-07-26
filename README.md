@@ -2,14 +2,18 @@
 A collection of python classes and functions.
 
 ## Getting it
+#### Github
 Download it from github with a `git clone https://github.com/amartya00/thesoup.git`
 Navigate to the root, and run all tests to ensure everything is working with `nosetests -w tst/ --nocapture`
+
+Now install with `sudo pip3 install .`
+
+#### PyPi
+This is available on [PyPi](https://pypi.org/project/thesoup/) as well. Do a `sudo pip3 install thesoup` to install.
 
 **NOTE**: If you do not have nose tests, install it with `sudo pip3 install nose`
 
 **NOTE**: This is python3 only
-
-Now install with `sudo pip3 install .`
 
 ## Components
 ### Classes
@@ -32,7 +36,8 @@ It has the following utility classes:
 It has the following utility functions
   - Collection related
     - Flatten a nested collection `flatten`
-    - Flatten annested collection except the tuples `flatten_to_tuple`
+    - Flatten a nested collection except the tuples `flatten_to_tuple`
+    - Find all subsequences of a list `subsequence`
     
   - Graph traversals
     - Bread first search `bfs`
