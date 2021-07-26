@@ -16,7 +16,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="thesoup",
-    version="0.4",
+    version="0.5",
     description="A soup of random python utils",
     long_description=long_description,
     long_description_content_type="text/markdown",
