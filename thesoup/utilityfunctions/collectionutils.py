@@ -35,3 +35,34 @@ def flatten_to_tuple(item):
         return flattened
     else:
         return [item]
+
+
+def _all_subsequences_from_idx(arr: list, start: int, memo: dict) -> list:
+    if start in memo:
+        return memo[start]
+    start_elem = arr[start]
+    all_subs = [[start_elem]]
+    for it in range(start+1, len(arr)):
+        sub_subsequences = _all_subsequences_from_idx(arr, it, memo)
+        all_subs.extend(
+            [[start_elem] + s for s in sub_subsequences]
+        )
+    memo[start] = all_subs
+    return all_subs
+
+
+def subsequence(arr: list) -> list:
+    """
+    This function returns all subsequences of a list. A subsequence is defined as any sublist of a list such that the
+    elements in the subsequence are in the same order as the original list.
+    Example: Subsequences of [1, 2, 3] are [1], [2], [3], [1, 2], [1, 3], [2, 3]
+
+    :param arr: The list whose subsequences are needed.
+    :return: A list of subsequences (list[list])
+    """
+    all_subs = []
+    memo = dict()
+    for it in range(len(arr)):
+        all_subs.extend(_all_subsequences_from_idx(arr, it, memo))
+    return all_subs
+
