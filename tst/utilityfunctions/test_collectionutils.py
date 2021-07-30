@@ -1,6 +1,7 @@
 import unittest
 
-from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence
+from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence, foreach
+from thesoup.utilityclasses.sets import CountSet
 
 
 class TestCollectionUtils (unittest.TestCase):
@@ -26,3 +27,37 @@ class TestCollectionUtils (unittest.TestCase):
         actual_subsequences = subsequence(sample_arr)
         for actual in actual_subsequences:
             self.assertTrue(actual in expected_subs)
+
+    def test_foreach(self):
+        test_collection_1 = [1, 2, 3]
+        call_tester_1 = []
+        call = foreach(
+            lambda item: call_tester_1.append(item),
+            test_collection_1
+        ).then(
+            lambda item: call_tester_1.append(item)
+        ).then(
+            lambda item: call_tester_1.append(item)
+        )
+        self.assertEqual(0, len(call_tester_1))
+        call()
+        self.assertEqual(
+            [1, 1, 1, 2, 2, 2, 3, 3, 3],
+            call_tester_1
+        )
+        test_collection_2 = {1, 2, 3}
+        call_tester_2 = CountSet()
+        call = foreach(
+            lambda item: call_tester_2.add(item),
+            test_collection_2
+        ).then(
+            lambda item: call_tester_2.add(item)
+        ).then(
+            lambda item: call_tester_2.add(item)
+        )
+        self.assertEqual(0, len(call_tester_2))
+        call()
+        self.assertEqual(
+            CountSet([1, 1, 1, 2, 2, 2, 3, 3, 3]),
+            call_tester_2
+        )

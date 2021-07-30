@@ -41,6 +41,7 @@ It has the following utility functions
     - Flatten a nested collection `flatten`
     - Flatten a nested collection except the tuples `flatten_to_tuple`
     - Find all subsequences of a list `subsequence`
+    - Foreach method that works on all collections `foreach`
     
   - Graph traversals
     - Bread first search `bfs`

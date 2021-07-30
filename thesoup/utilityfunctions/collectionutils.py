@@ -1,5 +1,4 @@
-from thesoup.utilityclasses.binarytree import BinarySearchTree, _BinaryTreeElement
-
+from inspect import getfullargspec
 
 def flatten(item):
     """
@@ -68,3 +67,57 @@ def subsequence(arr: list) -> list:
     for it in range(len(arr)):
         all_subs.extend(_all_subsequences_from_idx(arr, it, memo))
     return all_subs
+
+
+class _Foreach:
+    def __init__(self, functor, iterable):
+        num_args = len(getfullargspec(functor).args)
+        if num_args != 1:
+            raise TypeError(f"Passed function should take only 1 argument, instead it expects {num_args}.")
+        if not hasattr(iterable, "__iter__"):
+            raise TypeError(f"{iterable} is not iterable.")
+        self._functors = [functor]
+        self._iterable = iterable
+
+    def then(self, functor):
+        num_args = len(getfullargspec(functor).args)
+        if num_args != 1:
+            raise TypeError(f"Passed function should take only 1 argument, instead it expects {num_args}.")
+        self._functors.append(functor)
+        return self
+
+    def __call__(self, *args, **kwargs):
+        for item in self._iterable:
+            for function in self._functors:
+                function(item)
+
+
+def foreach(functor, iterable):
+    """
+    This function allows the user to apply a method on each element of an iterable. Unlike `map`, there is no side effect.
+    So you cannot use it to transform your iterable into a new one.
+
+    This is lazily evaluated, and allows chaining using `then` function. You need to call the `()` method to start
+    evaluation.
+
+    Example
+    -------
+    ```
+    my_list = [1, 2, 3]
+    foreach(lambda item: print(f"Parsing {item} in f1"), my_list)
+        .then(lambda item: print(f"Parsing {item} in f2"))
+        .then(lambda item: print(f"Parsing {item} in f3"))()
+
+    Output will be
+    Parsing 1 in f1
+    Parsing 1 in f2
+    Parsing 1 in f3
+    Parsing 2 in f1 .....
+
+    :param functor: The function to apply gto each element in an iterable.
+    :param iterable: The iterable under processing.
+    :return: A _ForEach object (this is internal). Just use the `.then` method to chain or just call it `()` to start
+    execution.
+    ```
+    """
+    return _Foreach(functor, iterable)
