@@ -45,6 +45,9 @@ It has the following utility functions
     - Dijkstra `dijkstra`
     - Specialized SP for DAGs `shortest_path_dag`
     
+  - String related
+    - Test if 2 strings are anagrams `is_anagram`  
+    
   - Other
     - K-way merge `merge`
     
