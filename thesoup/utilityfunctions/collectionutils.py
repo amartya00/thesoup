@@ -1,3 +1,6 @@
+from thesoup.utilityclasses.binarytree import BinarySearchTree, _BinaryTreeElement
+
+
 def flatten(item):
     """
     Recursively flattens a nested set of collections. Example
@@ -65,4 +68,3 @@ def subsequence(arr: list) -> list:
     for it in range(len(arr)):
         all_subs.extend(_all_subsequences_from_idx(arr, it, memo))
     return all_subs
-

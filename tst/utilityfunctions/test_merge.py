@@ -32,4 +32,3 @@ class TestMerge (unittest.TestCase):
         self.assertEqual(expected_list, actual_1)
         self.assertEqual(actual_1, actual_2)
         self.assertEqual(actual_2, actual_3)
-

@@ -25,5 +25,4 @@ class TestCollectionUtils (unittest.TestCase):
         ]
         actual_subsequences = subsequence(sample_arr)
         for actual in actual_subsequences:
-            print(actual)
             self.assertTrue(actual in expected_subs)
