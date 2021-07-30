@@ -31,6 +31,9 @@ It has the following utility classes:
      - BST `BinarySearchTree`
     
   - Trie (ASCII only)
+
+  - Sets
+    - A set that keeps track of the number of occurrences of repeated elements `CountSet` 
   
 ## Functions
 It has the following utility functions
