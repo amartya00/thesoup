@@ -1,6 +1,6 @@
 import unittest
 
-from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence, foreach
+from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence, foreach, transform
 from thesoup.utilityclasses.sets import CountSet
 
 
@@ -32,32 +32,53 @@ class TestCollectionUtils (unittest.TestCase):
         test_collection_1 = [1, 2, 3]
         call_tester_1 = []
         call = foreach(
-            lambda item: call_tester_1.append(item),
+            lambda item: item**2,
             test_collection_1
         ).then(
-            lambda item: call_tester_1.append(item)
+            lambda item: item + 1
+        ).then(
+            lambda item: item * (-1)
         ).then(
             lambda item: call_tester_1.append(item)
         )
         self.assertEqual(0, len(call_tester_1))
         call()
         self.assertEqual(
-            [1, 1, 1, 2, 2, 2, 3, 3, 3],
+            [-2, -5, -10],
             call_tester_1
         )
         test_collection_2 = {1, 2, 3}
-        call_tester_2 = CountSet()
+        call_tester_2 = set()
         call = foreach(
-            lambda item: call_tester_2.add(item),
+            lambda item: item ** 2,
             test_collection_2
         ).then(
-            lambda item: call_tester_2.add(item)
+            lambda item: item + 1
+        ).then(
+            lambda item: item * (-1)
         ).then(
             lambda item: call_tester_2.add(item)
         )
         self.assertEqual(0, len(call_tester_2))
         call()
         self.assertEqual(
-            CountSet([1, 1, 1, 2, 2, 2, 3, 3, 3]),
+            {-2, -5, -10},
             call_tester_2
+        )
+
+    def test_transform(self):
+        my_list = [1, 2, 3, 4, 5]
+        transformed_obj = transform(
+            lambda item: item**2,
+            my_list
+        ).then(
+            lambda item: item + 1
+        ).then(
+            lambda item: item * (-1)
+        )
+        transformed_list = list(transformed_obj)
+        print(transformed_list)
+        self.assertEqual(
+            [-2, -5, -10, -17, -26],
+            transformed_list
         )

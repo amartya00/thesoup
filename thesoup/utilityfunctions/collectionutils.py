@@ -88,8 +88,49 @@ class _Foreach:
 
     def __call__(self, *args, **kwargs):
         for item in self._iterable:
+            temp = item
             for function in self._functors:
-                function(item)
+                temp = function(temp)
+
+
+class _Transform:
+    def __init__(self, functor, iterable):
+        num_args = len(getfullargspec(functor).args)
+        if num_args != 1:
+            raise TypeError(f"Passed function should take only 1 argument, instead it expects {num_args}.")
+        if not hasattr(iterable, "__iter__"):
+            raise TypeError(f"{iterable} is not iterable.")
+        self._functors = [functor]
+        self._iterable = iterable
+        self._internal_store = list()
+
+    def then(self, functor):
+        num_args = len(getfullargspec(functor).args)
+        if num_args != 1:
+            raise TypeError(f"Passed function should take only 1 argument, instead it expects {num_args}.")
+        self._functors.append(functor)
+        return self
+
+    def __call__(self, *args, **kwargs):
+        for item in self._iterable:
+            transformed = None
+            for function in self._functors:
+                transformed = function(item)
+            self._internal_store.append(transformed)
+
+    def __iter__(self):
+        class _TransformIterator:
+            def __init__(self, collection, functors: list):
+                self._functors = functors
+                self._it = iter(collection)
+
+            def __next__(self):
+                raw_item = self._it.__next__()
+                transformed_item = raw_item
+                for f in self._functors:
+                    transformed_item = f(transformed_item)
+                return transformed_item
+        return _TransformIterator(self._iterable, self._functors)
 
 
 def foreach(functor, iterable):
@@ -121,3 +162,37 @@ def foreach(functor, iterable):
     ```
     """
     return _Foreach(functor, iterable)
+
+
+# TODO: Add filter capabilities
+def transform(functor, iterable):
+    """
+    This function allows the user to apply a method on each element of an iterable, and produce a new one. The difference
+    between this and Python's build in `map` function is that this allows chaining using `then` function.
+
+    Example
+    -------
+    ```
+    my_list = [1, 2, 3]
+    transformed = transform(
+            lambda item: item**2,
+            my_list
+        ).then(
+            lambda item: item + 1
+        ).then(
+            lambda item: item * (-1)
+        )
+    transformed_list = list(transformed)
+    print(transformed_list)
+
+    Output will be
+    [-2, -5, -10]
+
+    :param functor: The function to apply gto each element in an iterable.
+    :param iterable: The iterable under processing.
+    :return: A _Transform object (this is internal). Just use the `.then` method to chain more transformer functions. You
+        can pass the returned object to the constructor of any iterable just like you would with a `map` object.
+
+    ```
+    """
+    return _Transform(functor, iterable)

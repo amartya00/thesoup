@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class _BinaryTreeElement:
-    """
-    This class is meant to be used internally in a Binary Tree. Do not use it by itself
-    """
     def __init__(self, val):
         self.val = val
         self.count = 1
@@ -18,7 +15,13 @@ class _BinaryTreeElement:
 
 class BinaryTree (ABC):
     """
-    This is the interface for a binary tree
+    This is the interface for a binary tree. Learn more about binary trees here: https://en.wikipedia.org/wiki/Binary_tree.
+    Any implementation of this should provide methods for:
+    1. Insert
+    2. Search
+    3. Delete
+    4. Size
+    5. Iterator
     """
     @abstractmethod
     def __contains__(self, item):
