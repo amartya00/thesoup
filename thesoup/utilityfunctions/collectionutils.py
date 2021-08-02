@@ -1,5 +1,6 @@
 from inspect import getfullargspec
 
+
 def flatten(item):
     """
     Recursively flattens a nested set of collections. Example
@@ -135,8 +136,8 @@ class _Transform:
 
 def foreach(functor, iterable):
     """
-    This function allows the user to apply a method on each element of an iterable. Unlike `map`, there is no side effect.
-    So you cannot use it to transform your iterable into a new one.
+    This function allows the user to apply a method on each element of an iterable. Unlike `map`, there is no side
+    effect. So you cannot use it to transform your iterable into a new one.
 
     This is lazily evaluated, and allows chaining using `then` function. You need to call the `()` method to start
     evaluation.
@@ -167,8 +168,8 @@ def foreach(functor, iterable):
 # TODO: Add filter capabilities
 def transform(functor, iterable):
     """
-    This function allows the user to apply a method on each element of an iterable, and produce a new one. The difference
-    between this and Python's build in `map` function is that this allows chaining using `then` function.
+    This function allows the user to apply a method on each element of an iterable, and produce a new one. The
+    difference between this and Python's build in `map` function is that this allows chaining using `then` function.
 
     Example
     -------
@@ -190,8 +191,8 @@ def transform(functor, iterable):
 
     :param functor: The function to apply gto each element in an iterable.
     :param iterable: The iterable under processing.
-    :return: A _Transform object (this is internal). Just use the `.then` method to chain more transformer functions. You
-        can pass the returned object to the constructor of any iterable just like you would with a `map` object.
+    :return: A _Transform object (this is internal). Just use the `.then` method to chain more transformer functions.
+    You can pass the returned object to the constructor of any iterable just like you would with a `map` object.
 
     ```
     """
