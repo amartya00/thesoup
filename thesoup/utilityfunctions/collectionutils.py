@@ -5,11 +5,46 @@ def flatten(item):
     """
     Recursively flattens a nested set of collections. Example
     (1, (2, 3)) would be flattened to [1,2,3]
+
+    Dictionaries are flattened to tuples. Example
+    {
+            '213': {
+                'abc': 'def',
+                'xyz': 'ccc'
+            },
+            '214': {
+                'abc': 'xyz',
+                'papaya': [1, (2, 3)]
+            }
+        }
+    would be flattened to
+    [
+        ('213', 'abc', 'def'),
+        ('213', 'xyz', 'ccc'),
+        ('214', 'abc', 'xyz'),
+        ('214', 'papaya', 1),
+        ('214', 'papaya', 2),
+        ('214', 'papaya', 3)
+    ]
     :param item: A possibly nested iterable
     :return: A flat list
     """
     if type(item) == str:
         return [item]
+    elif type(item) == dict:
+        flattened = []
+        for k, v in item.items():
+            flattened_values = flatten(v)
+            for flattened_value in flattened_values:
+                if type(flattened_value) != str and hasattr(flattened_value, '__iter__'):
+                    flattened.append(
+                        tuple(
+                            [k] + [vv for vv in flattened_value]
+                        )
+                    )
+                else:
+                    flattened.append((k, flattened_value))
+        return flattened
     elif hasattr(item, "__iter__"):
         flattened = []
         for itm in item:
@@ -24,6 +59,27 @@ def flatten_to_tuple(item):
     Recursively flattens a nested set of collections, except tuples. Example
     (1, (2, 3)) would be flattened to [1,(2,3)]. However [[1, 2], [(3,4), 5] will
     be flattened to [1, 2, (3, 4), 5]
+
+    Dictionaries are flattened to tuples. Example
+    {
+            '213': {
+                'abc': 'def',
+                'xyz': 'ccc'
+            },
+            '214': {
+                'abc': 'xyz',
+                'papaya': [1, (2, 3)]
+            }
+        }
+    would be flattened to
+    [
+        ('213', ('abc', 'def')),
+        ('213', ('xyz', 'ccc')),
+        ('214', ('abc', 'xyz')),
+        ('214', ('papaya', 1)),
+        ('214', ('papaya', (2, 3)))
+    ]
+
     :param item: A possibly nested iterable
     :return: A flat list
     """
@@ -31,6 +87,20 @@ def flatten_to_tuple(item):
         return [item]
     elif type(item) == tuple:
         return [item]
+    elif type(item) == dict:
+        flattened = []
+        for k, v in item.items():
+            flattened_values = flatten_to_tuple(v)
+            for flattened_value in flattened_values:
+                if type(flattened_value) != tuple and type(flattened_value) != str and hasattr(flattened_value, '__iter__'):
+                    flattened.append(
+                        tuple(
+                            [k] + [vv for vv in flattened_value]
+                        )
+                    )
+                else:
+                    flattened.append((k, flattened_value))
+        return flattened
     elif hasattr(item, "__iter__"):
         flattened = []
         for itm in item:

@@ -5,8 +5,26 @@ from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple
 
 def bfs(graph: Graph, start) -> dict:
     """
-    This implements bread first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
-    `O(v)` where `v` is the number of vertices.
+    This function implements bread first search on an object of type Graph. Complexity of such an algorithm is upper
+    bound by `O(v)` where `v` is the number of vertices.
+
+    It returns a map representing the predecessor relationship and "levels" of vertices. Example, consider the graph
+
+    ```
+    A -- B
+     `-- C-- D
+          `-- E
+    ```
+
+    Starting from A, the `bfs` function will return a map like this:
+    {
+      "A": (None, 0),
+      "B": ("A", 1),
+      "C": ("A", 1),
+      "D": ("C", 2),
+      "E": ("C",2)
+    }
+    This structure can be used to trace paths between the start to any reachable vertex.
 
     :param graph: The Digraph to traverse
     :param start: The starting point
@@ -50,8 +68,27 @@ def _dfs_callback(graph: Graph, start, parents: dict):
 
 def dfs(graph: Graph, start):
     """
-    This implements depth first search on an object of type DiGraph. Complexity of such an algorithm is upper bound by
+    This implements depth first search on an object of type Graph. Complexity of such an algorithm is upper bound by
     `O(v)` where `v` is the number of vertices.
+
+    It returns a map representing the predecessor relationship. Example consider the graph
+
+    ```
+    A -- B
+     `-- C-- D
+          `-- E
+    ```
+
+    Starting from A, the `dfs` function will return a map like this:
+    {
+      "A": None,
+      "B": "A",
+      "C": "A",
+      "D": "C",
+      "E": "C"
+    }
+    This structure can be used to trace paths between the start to any reachable vertex.
+
 
     :param graph: The Digraph to traverse
     :param start: The starting point
@@ -68,6 +105,9 @@ def dijkstra(graph: Graph, start) -> (dict, dict):
     """
     This implements the dijkstra's algorithm fpr shortest path. It returns a tuple containing 2 dictionaries:
     a map of distances of vertices from `start` and another congaing the predecessor of each vertex.
+
+    NOTE: The input type is `Graph`. There is no separate interface for a di-graph in this library. Implementations of
+    the `Graph` class must make it a di-graph. Otherwise this algorithm will hang.
 
     :param graph: The Digraph to traverse
     :param start: The starting point

@@ -1,17 +1,57 @@
 import unittest
 
 from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence, foreach, transform
-from thesoup.utilityclasses.sets import CountSet
 
 
 class TestCollectionUtils (unittest.TestCase):
     def test_flatten(self):
         my_nested_collection = (1, (2, [1, 2, 3]), ("a", (1, 2)))
         self.assertEqual([1, 2, 1, 2, 3, "a", 1, 2], flatten(my_nested_collection))
+        my_nested_collection_2 = {
+            '213': {
+                'abc': 'def',
+                'xyz': 'ccc'
+            },
+            '214': {
+                'abc': 'xyz',
+                'papaya': [1, (2, 3)]
+            }
+        }
+        self.assertEqual(
+            [
+                ('213', 'abc', 'def'),
+                ('213', 'xyz', 'ccc'),
+                ('214', 'abc', 'xyz'),
+                ('214', 'papaya', 1),
+                ('214', 'papaya', 2),
+                ('214', 'papaya', 3)
+            ],
+            flatten(my_nested_collection_2)
+        )
 
     def test_flatten_tuple(self):
         my_nested_collection = [1, [2, (1, 2, 3)], ["a", (1, 2)]]
         self.assertEqual([1, 2, (1, 2, 3), "a", (1, 2)], flatten_to_tuple(my_nested_collection))
+        my_nested_collection_2 = {
+            '213': {
+                'abc': 'def',
+                'xyz': 'ccc'
+            },
+            '214': {
+                'abc': 'xyz',
+                'papaya': [1, (2, 3)]
+            }
+        }
+        self.assertEqual(
+            [
+                ('213', ('abc', 'def')),
+                ('213', ('xyz', 'ccc')),
+                ('214', ('abc', 'xyz')),
+                ('214', ('papaya', 1)),
+                ('214', ('papaya', (2, 3)))
+            ],
+            flatten_to_tuple(my_nested_collection_2)
+        )
 
     def test_subsequence(self):
         sample_arr = [1, 2, 3]
@@ -77,7 +117,6 @@ class TestCollectionUtils (unittest.TestCase):
             lambda item: item * (-1)
         )
         transformed_list = list(transformed_obj)
-        print(transformed_list)
         self.assertEqual(
             [-2, -5, -10, -17, -26],
             transformed_list
