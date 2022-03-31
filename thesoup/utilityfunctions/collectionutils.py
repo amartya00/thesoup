@@ -182,13 +182,6 @@ class _Transform:
         self._functors.append(functor)
         return self
 
-    def __call__(self, *args, **kwargs):
-        for item in self._iterable:
-            transformed = None
-            for function in self._functors:
-                transformed = function(item)
-            self._internal_store.append(transformed)
-
     def __iter__(self):
         class _TransformIterator:
             def __init__(self, collection, functors: list):
@@ -267,3 +260,46 @@ def transform(functor, iterable):
     ```
     """
     return _Transform(functor, iterable)
+
+
+def group_by(functor, iterable) -> dict:
+    """
+    This function groups an iterable into a dictionary ver much similar to Scala's groupBy method. This function will
+    apply a callable to each item in the iterable to generate a key, and all the items that generate the same key will
+    be grouped as values.
+
+    Example
+    -------
+    ```
+    my_list = [
+        [1, "a"],
+        [1, "b"],
+        [2, "a"],
+    ]
+    grouped = group_by(
+        lambda item: item[0],
+        my_list
+    )
+
+    print(grouped)
+
+    Output will be
+    {
+        1: [[1, "a"], [1, "b"]],
+        2: [[2, "a"]]
+    }
+
+    :param functor: The function to apply gto each element in an iterable.
+    :param iterable: The iterable under processing.
+    :return: A _Transform object (this is internal). Just use the `.then` method to chain more transformer functions.
+    You can pass the returned object to the constructor of any iterable just like you would with a `map` object.
+
+    ```
+    """
+    retval = dict()
+    for item in iterable:
+        key = functor(item)
+        if key not in retval:
+            retval[key] = list()
+        retval[key].append(item)
+    return retval

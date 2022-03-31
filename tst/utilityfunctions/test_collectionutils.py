@@ -1,6 +1,13 @@
 import unittest
 
-from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple, subsequence, foreach, transform
+from thesoup.utilityfunctions.collectionutils import (
+    flatten,
+    flatten_to_tuple,
+    subsequence,
+    foreach,
+    transform,
+    group_by,
+)
 
 
 class TestCollectionUtils (unittest.TestCase):
@@ -121,3 +128,22 @@ class TestCollectionUtils (unittest.TestCase):
             [-2, -5, -10, -17, -26],
             transformed_list
         )
+
+    def test_group_by(self):
+        my_list = [
+            [1, "a"],
+            [1, "b"],
+            [2, "a"],
+        ]
+        grouped = group_by(
+            lambda item: item[0],
+            my_list
+        )
+        self.assertEqual(
+            {
+                1: [[1, "a"], [1, "b"]],
+                2: [[2, "a"]]
+            },
+            grouped
+        )
+

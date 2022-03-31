@@ -21,20 +21,24 @@ It has the following utility classes:
   - Graphs
     - Abstract class for directed graph `DiGraph`
     - Abstract class for directed mutable graph `MutableDiGraph`
-    - A mutable digraph implementation with adjacensy list `AdjListGraph`
+    - A mutable digraph implementation with adjacency list `AdjListGraph`
     
   - Heap
     - Min heap `Minheap`
     - Max heap `MaxHeap`
     
-   - Binary trees
-     - BST `BinarySearchTree`
+  - Binary trees
+    - BST `BinarySearchTree`
     
   - Trie (ASCII only)
 
   - Sets
     - A set that keeps track of the number of occurrences of repeated elements `CountSet` 
-  
+    - A disjoint sets utility. See the [Wikipedia entry](https://en.wikipedia.org/wiki/Disjoint-set_data_structure) `DisjointSets` for details on what it is
+    
+  - Utilities
+    - A result class, similar to Rust's `Result`.
+
 ## Functions
 It has the following utility functions
   - Collection related
@@ -42,6 +46,7 @@ It has the following utility functions
     - Flatten a nested collection except the tuples `flatten_to_tuple`
     - Find all subsequences of a list `subsequence`
     - Foreach method that works on all collections `foreach`
+    - Group a collection into a map by some criteria `group_by`
     
   - Graph traversals
     - Bread first search `bfs`
