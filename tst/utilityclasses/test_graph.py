@@ -87,6 +87,23 @@ class TestDiGraph (unittest.TestCase):
         expected_edge_set = {Edge("A", "B", 155), Edge("A", "C", 123), Edge("C", "B", 98)}
         self.assertEqual(expected_edge_set, g.edges())
 
+    def test_json_initializer_without_edge_property(self):
+        json_str = """
+        {
+            "A": ["B", "C"],
+            "B": [],
+            "C": ["B"]
+        }
+        """
+        g = AdjListDiGraph.from_json(json_str)
+        self.assertEqual({("B", None), ("C", None)}, g.get_neighbours("A"))
+        self.assertEqual({("B", None)}, g.get_neighbours("C"))
+        self.assertEqual(set(), g.get_neighbours("B"))
+        self.assertEqual({"A", "B", "C"}, g.vertices())
+
+        expected_edge_set = {Edge("A", "B", None), Edge("A", "C", None), Edge("C", "B", None)}
+        self.assertEqual(expected_edge_set, g.edges())
+
 
 class TestUndirectedGraph (unittest.TestCase):
     def test_undirected_graph(self):

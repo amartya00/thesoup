@@ -162,7 +162,8 @@ class AdjListDiGraph (MutableGraph):
             graph.add_vertex(v)
 
         for v, edges in data.items():
-            for destination, ppt in edges:
+            for e in edges:
+                destination, ppt = e if len(e) > 1 else (e, None)
                 graph.add_edge(Edge(v, destination, ppt))
 
         return graph
@@ -170,7 +171,7 @@ class AdjListDiGraph (MutableGraph):
 
 class AdjListUndirectedDiGraph (AdjListDiGraph):
     """
-    Implementation of a directed graph using adjacency list.
+    Implementation of an undirected graph using adjacency list.
     NOTE: For this, the vertices have to have the __gt__ operator implemented.
     NOTE: This does allow multiple edges with different weights to exist between nodes.
     """
@@ -200,7 +201,8 @@ class AdjListUndirectedDiGraph (AdjListDiGraph):
             graph.add_vertex(v)
 
         for v, edges in data.items():
-            for destination, ppt in edges:
+            for e in edges:
+                destination, ppt = e if len(e) > 1 else (e, None)
                 graph.add_edge(Edge(v, destination, ppt))
 
         return graph
