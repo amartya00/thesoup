@@ -1,7 +1,10 @@
+import dataclasses
 import unittest
 
-from thesoup.utilityclasses.graph import AdjListDiGraph
-from thesoup.utilityfunctions.graphtraversals import bfs, dfs, dijkstra, shortest_path_dag
+from typing import Any, List, Tuple
+
+from thesoup.utilityclasses.graph import AdjListDiGraph, Graph
+from thesoup.utilityfunctions.graphtraversals import bfs, dfs, dijkstra, shortest_path_dag, trace
 
 
 class TestGraphTraversals (unittest.TestCase):
@@ -16,24 +19,46 @@ class TestGraphTraversals (unittest.TestCase):
         }
         """
         graph = AdjListDiGraph.from_json(json_str)
+        parents = dict()
+
+        def _bfs_callback(info: Tuple[Any, Any, int]):
+            u, v, w = info
+            parents[v] = (u, w)
+
+        bfs(graph, "A", _bfs_callback)
         self.assertEqual(
             {"A": (None, 0), "B": ("A", 1), "C": ("A", 1), "D": ("C", 2), "E": ("D", 3)},
-            bfs(graph, "A")
+            parents
         )
+        parents.clear()
+
+        bfs(graph, "B", _bfs_callback)
         self.assertEqual(
-            {"B"}, set(bfs(graph, "B").keys())
+            {"B"}, set(parents.keys())
         )
+        parents.clear()
+
+        bfs(graph, "C", _bfs_callback)
         self.assertEqual(
-            {"B", "C", "D", "E"}, set(bfs(graph, "C").keys())
+            {"B", "C", "D", "E"}, set(parents.keys())
         )
+        parents.clear()
+
+        bfs(graph, "D", _bfs_callback)
         self.assertEqual(
-            {"D", "E"}, set(bfs(graph, "D").keys())
+            {"D", "E"}, set(parents.keys())
         )
+        parents.clear()
+
+        bfs(graph, "E", _bfs_callback)
         self.assertEqual(
-            {"E"}, set(bfs(graph, "E").keys())
+            {"E"}, set(parents.keys())
         )
+        parents.clear()
+
+        bfs(graph, "Z", _bfs_callback)
         self.assertEqual(
-            set(), set(bfs(graph, "Z").keys())
+            set(), set(parents.keys())
         )
 
     def test_dfs(self):
@@ -150,3 +175,56 @@ class TestGraphTraversals (unittest.TestCase):
             },
             predecessors
         )
+
+    def test_trace(self):
+        sample_graph_json = """
+            {
+                "A": ["B", "C"],
+                "B": ["C", "D"],
+                "C": ["D", "B"],
+                "D": ["C"],
+                "E": []
+            }
+            """
+        graph = AdjListDiGraph.from_json(sample_graph_json)
+        self.assertTrue(trace(graph, ["A", "C", "B", "D"]))
+        self.assertFalse(trace(graph, ["A", "C", "B", "E"]))
+        self.assertFalse(trace(graph, ["A", "D"]))
+        self.assertTrue(trace(graph, []))
+        self.assertFalse(trace(graph, ["A", "C", "B", "A"]))\
+
+
+    def test_scrabble(self):
+        @dataclasses.dataclass
+        class MatrxElement:
+            item: Any
+            row: int
+            col: int
+
+            def __eq__(self, other):
+                if type(other) == type(self):
+                    return other.item == self.item and other.row == self.row and other.col == self.col
+                else:
+                    return other == self.item
+
+        class Matrix (Graph):
+            def __int__(self, matrix: List[List[Any]]):
+                self._matrix = matrix[:]
+                self._rows = len(matrix)
+                self._cols = len(matrix[0]) if len(matrix) > 0 else 0
+
+            def get_neighbours(self, item: MatrxElement) -> list:
+                if type(item) != MatrxElement:
+                    for r in range(self._rows):
+                        for c in range(self._cols):
+                            if self._matrix[r][c] == item:
+                                row, col = r, c
+                                return [self._matrix[r][c] for r, c in
+                                        [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)] if
+                                        0 <= r <= self._rows and 0 <= c <= self._cols]
+                else:
+                    row, col = item.row, item.col
+                    return [self._matrix[r][c] for r, c in [(row-1, col), (row+1, col), (row, col-1), (row, col+1)] if 0 <= r <= self._rows and 0 <= c <= self._cols]
+
+            def __contains__(self, item):
+                pass

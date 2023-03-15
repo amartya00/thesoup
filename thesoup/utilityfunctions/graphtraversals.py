@@ -1,9 +1,15 @@
+from collections.abc import Sequence
+from typing import Any, Callable, Tuple
 from thesoup.utilityclasses.graph import Graph
 from thesoup.utilityclasses.heap import MinHeap
-from thesoup.utilityfunctions.collectionutils import flatten, flatten_to_tuple
+from thesoup.utilityfunctions.collectionutils import flatten_to_tuple, foreach
 
 
-def bfs(graph: Graph, start) -> dict:
+def _no_op(_from: Any, _to: Any):
+    pass
+
+
+def bfs(graph: Graph, start: Any, bfs_callback: Callable[[Tuple[Any, Any, int]], type(None)]):
     """
     This function implements bread first search on an object of type Graph. Complexity of such an algorithm is upper
     bound by `O(v)` where `v` is the number of vertices.
@@ -28,35 +34,39 @@ def bfs(graph: Graph, start) -> dict:
 
     :param graph: The Digraph to traverse
     :param start: The starting point
-    :return: A map of predecessors and levels.
+    :param bfs_callback: The function to call at each visit. it is called as callable((from, to, level)) and returns nothing.
     """
-    predecessors = dict()
+    visited = set()
     if start in graph:
-        predecessors[start] = (None, 0)
+        bfs_callback((None, start, 0))
+        visited.add(start)
     else:
-        return dict()
+        return
     frontier = {start}
     level = 1
     while len(frontier) > 0:
-        next_frontier_unfiltered = flatten_to_tuple(
-                [set(map(
-                    lambda node: (node[0], (u, level)),
-                    graph.get_neighbours(u)
-                )) for u in frontier]
-            )
-        next_frontier = set(filter(
-            lambda elem: elem[0] not in predecessors,
-            next_frontier_unfiltered
-        ))
-        predecessors.update(next_frontier)
-        frontier = set(
-            map(
-                lambda item: item[0],
-                next_frontier
+        next_frontier_detailed = set(
+            filter(
+                lambda t: t[1] not in visited,
+                flatten_to_tuple(
+                    [[(u, v, level) for v, _ in graph.get_neighbours(u)] for u in frontier]
+                )
+
             )
         )
+        foreach(
+            bfs_callback,
+            next_frontier_detailed
+        )()
+        next_frontier = set(
+            map(
+                lambda t: t[1],
+                next_frontier_detailed
+            )
+        )
+        visited.update(next_frontier)
+        frontier = next_frontier
         level += 1
-    return predecessors
 
 
 def _dfs_callback(graph: Graph, start, parents: dict):
@@ -176,3 +186,27 @@ def shortest_path_dag(graph: Graph, start, end) -> (float, dict):
     predecessors = {start: None}
     sp = _shortest_path_dag_explorer(graph, predecessors, memo, start, end)
     return sp, predecessors
+
+
+def _trace_callback(graph: Graph, curr_node: Any, trace_path: Sequence[Any], next_idx: int, visited: set) -> bool:
+    if next_idx == len(trace_path):
+        return True
+    next_node = trace_path[next_idx]
+    for n, _ in graph.get_neighbours(curr_node):
+        if n not in visited and n == next_node:
+            visited.add(n)
+            retval = _trace_callback(graph, n, trace_path, next_idx+1, visited)
+            if retval:
+                return True
+    visited.remove(curr_node)
+    return False
+
+
+def trace(graph: Graph, path: Sequence):
+    if len(path) == 0:
+        return True
+    if path[0] not in graph:
+        return False
+    visited = {path[0]}
+    return _trace_callback(graph, path[0], path, 1, visited)
+

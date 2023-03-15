@@ -8,15 +8,15 @@ here = path.abspath(path.dirname(__file__))
 version_maj = sys.version_info[0]
 version_min = sys.version_info[1]
 
-if version_maj < 3:
-    sys.exit("Need python 3 to run. You are trying to install this with python {}.{}".format(version_maj, version_min))
+if not (version_maj >= 3 and version_min >= 3):
+    sys.exit("Need >= python 3.3     to run. You are trying to install this with python {}.{}".format(version_maj, version_min))
 
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name="thesoup",
-    version="1.00",
+    version="1.01",
     description="A soup of random python utils",
     long_description=long_description,
     long_description_content_type="text/markdown",
